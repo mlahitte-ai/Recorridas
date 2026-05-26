@@ -714,11 +714,10 @@
   <div class="card" style="margin-bottom:14px;">
     <div class="card-title">🗺️ Trayectoria del día</div>
     <div id="mapa-container">
-      <div class="mapa-placeholder" id="mapa-placeholder">
+      <div class="mapa-placeholder" id="mapa-placeholder" style="display:flex;flex-direction:column;align-items:center;justify-content:center;">
         <div class="icon">🗺️</div>
         <p>Guardá observaciones con GPS<br>para ver los pins en el mapa</p>
       </div>
-      <iframe id="mapa-iframe"></iframe>
     </div>
   </div>
   <div class="pin-list" id="pin-list"></div>
@@ -994,30 +993,47 @@ function limpiarTodo() {
 }
 
 // ══ MAPA ══
+let mapaLeaflet = null;
+
 function renderMapa() {
   const conGPS = observaciones.filter(o => o.gps);
   const pinList = document.getElementById('pin-list');
   const mapaPlaceholder = document.getElementById('mapa-placeholder');
-  const mapaIframe = document.getElementById('mapa-iframe');
+  const mapaContainer = document.getElementById('mapa-container');
 
   if (!conGPS.length) {
-    mapaPlaceholder.style.display = 'block';
-    mapaIframe.style.display = 'none';
+    mapaPlaceholder.style.display = 'flex';
     pinList.innerHTML = '';
+    if (mapaLeaflet) { mapaLeaflet.remove(); mapaLeaflet = null; }
+    document.getElementById('mapa-div') && document.getElementById('mapa-div').remove();
     return;
   }
 
   mapaPlaceholder.style.display = 'none';
-  mapaIframe.style.display = 'block';
 
-  // Usar OpenStreetMap embed con marcadores
-  const center = conGPS[0];
-  const markers = conGPS.map((o, i) =>
-    `marker=${o.gps.lat},${o.gps.lng}`
-  ).join('&');
-  const url = `https://www.openstreetmap.org/export/embed.html?bbox=${conGPS[0].gps.lng-0.05},${conGPS[0].gps.lat-0.05},${conGPS[0].gps.lng+0.05},${conGPS[0].gps.lat+0.05}&layer=mapnik`;
-  mapaIframe.src = url;
+  // Crear div del mapa si no existe
+  if (!document.getElementById('mapa-div')) {
+    const div = document.createElement('div');
+    div.id = 'mapa-div';
+    div.style.cssText = 'width:100%;height:100%;';
+    mapaContainer.appendChild(div);
+  }
 
+  // Cargar Leaflet si no está cargado
+  if (!window.L) {
+    const css = document.createElement('link');
+    css.rel = 'stylesheet';
+    css.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+    document.head.appendChild(css);
+    const js = document.createElement('script');
+    js.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+    js.onload = () => iniciarMapa(conGPS);
+    document.head.appendChild(js);
+  } else {
+    iniciarMapa(conGPS);
+  }
+
+  // Lista de pins
   pinList.innerHTML = conGPS.map((obs, i) => `
     <div class="pin-item">
       <div class="pin-num">${i+1}</div>
@@ -1028,6 +1044,48 @@ function renderMapa() {
       </div>
     </div>
   `).join('');
+}
+
+function iniciarMapa(conGPS) {
+  if (mapaLeaflet) { mapaLeaflet.remove(); mapaLeaflet = null; }
+
+  const center = [parseFloat(conGPS[0].gps.lat), parseFloat(conGPS[0].gps.lng)];
+  mapaLeaflet = L.map('mapa-div').setView(center, 14);
+
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap'
+  }).addTo(mapaLeaflet);
+
+  // Marcadores numerados con color ocre
+  conGPS.forEach((obs, i) => {
+    const lat = parseFloat(obs.gps.lat);
+    const lng = parseFloat(obs.gps.lng);
+    const icon = L.divIcon({
+      className: '',
+      html: `<div style="
+        background:#C4872A;color:#2C1A0E;font-weight:700;font-size:13px;
+        width:30px;height:30px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);
+        display:flex;align-items:center;justify-content:center;
+        box-shadow:0 2px 8px rgba(0,0,0,0.3);border:2px solid white;
+      "><span style="transform:rotate(45deg)">${i+1}</span></div>`,
+      iconSize: [30, 30],
+      iconAnchor: [15, 30]
+    });
+    const marker = L.marker([lat, lng], {icon}).addTo(mapaLeaflet);
+    marker.bindPopup(`<b>${obs.estab}</b><br><i>${obs.cat}</i><br>${obs.hora}<br>${obs.texto.substring(0,80)}...`);
+  });
+
+  // Línea de trayectoria
+  if (conGPS.length > 1) {
+    const coords = conGPS.map(o => [parseFloat(o.gps.lat), parseFloat(o.gps.lng)]);
+    L.polyline(coords, { color: '#C4872A', weight: 3, opacity: 0.6, dashArray: '6,8' }).addTo(mapaLeaflet);
+  }
+
+  // Ajustar zoom para mostrar todos los puntos
+  if (conGPS.length > 1) {
+    const bounds = L.latLngBounds(conGPS.map(o => [parseFloat(o.gps.lat), parseFloat(o.gps.lng)]));
+    mapaLeaflet.fitBounds(bounds, { padding: [30, 30] });
+  }
 }
 
 // ══ INFORME ══
