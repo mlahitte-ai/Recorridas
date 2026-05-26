@@ -1,0 +1,1206 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Recorridas · Bellamar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --tierra: #2C1A0E;
+    --barro: #6B3D1E;
+    --ocre: #C4872A;
+    --paja: #E8C97A;
+    --campo: #4A6741;
+    --brote: #7BA05B;
+    --cielo: #8BB8C8;
+    --bg: #F5EFE6;
+    --bg2: #EDE4D6;
+    --txt: #1A1108;
+    --txt2: #5A4030;
+    --border: rgba(107,61,30,0.18);
+    --shadow: 0 4px 24px rgba(44,26,14,0.10);
+    --radius: 16px;
+    --radius-sm: 10px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--txt);
+    min-height: 100dvh;
+    overflow-x: hidden;
+    padding-bottom: 80px;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    background: var(--tierra);
+    padding: 20px 20px 16px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    box-shadow: 0 2px 20px rgba(44,26,14,0.3);
+  }
+  .header-logo {
+    width: 36px;
+    height: 36px;
+    background: var(--ocre);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+  }
+  .header-text h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 18px;
+    color: var(--paja);
+    line-height: 1;
+  }
+  .header-text p {
+    font-size: 11px;
+    color: rgba(232,201,122,0.6);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-top: 2px;
+  }
+  .header-status {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: rgba(232,201,122,0.7);
+  }
+  .status-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #5CB85C;
+    animation: pulse 2s infinite;
+  }
+  .status-dot.offline { background: #E8775A; animation: none; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+
+  /* ── TABS ── */
+  .tabs {
+    display: flex;
+    background: var(--tierra);
+    padding: 0 20px 12px;
+    gap: 4px;
+  }
+  .tab {
+    flex: 1;
+    padding: 8px 4px;
+    border: none;
+    background: rgba(255,255,255,0.07);
+    color: rgba(232,201,122,0.5);
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.03em;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+  }
+  .tab span.icon { font-size: 16px; }
+  .tab.active {
+    background: var(--ocre);
+    color: var(--tierra);
+    font-weight: 600;
+  }
+
+  /* ── PAGES ── */
+  .page { display: none; padding: 20px; }
+  .page.active { display: block; }
+
+  /* ── CARDS ── */
+  .card {
+    background: white;
+    border-radius: var(--radius);
+    padding: 18px;
+    margin-bottom: 14px;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+  }
+  .card-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 15px;
+    color: var(--tierra);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* ── ESTABLECIMIENTOS ── */
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .chip {
+    padding: 6px 13px;
+    border-radius: 20px;
+    border: 1.5px solid var(--border);
+    background: var(--bg);
+    color: var(--txt2);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .chip.active {
+    background: var(--tierra);
+    color: var(--paja);
+    border-color: var(--tierra);
+  }
+
+  /* ── CATEGORÍAS ── */
+  .cat-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+  .cat-btn {
+    padding: 10px 6px;
+    border-radius: var(--radius-sm);
+    border: 1.5px solid var(--border);
+    background: var(--bg);
+    color: var(--txt2);
+    font-size: 11px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    text-align: center;
+  }
+  .cat-btn span.icon { font-size: 20px; }
+  .cat-btn.active {
+    background: var(--campo);
+    color: white;
+    border-color: var(--campo);
+  }
+
+  /* ── BOTÓN GRABAR ── */
+  .record-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 0;
+  }
+  .record-btn {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    border: none;
+    background: var(--campo);
+    color: white;
+    font-size: 28px;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 4px 20px rgba(74,103,65,0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .record-btn.recording {
+    background: #C0392B;
+    animation: recording-pulse 1s infinite;
+  }
+  @keyframes recording-pulse {
+    0%,100% { box-shadow: 0 4px 20px rgba(192,57,43,0.4); transform: scale(1); }
+    50% { box-shadow: 0 4px 30px rgba(192,57,43,0.7); transform: scale(1.05); }
+  }
+  .record-timer {
+    font-family: 'DM Mono', monospace;
+    font-size: 20px;
+    color: var(--barro);
+    display: none;
+  }
+  .record-timer.visible { display: block; }
+
+  /* ── TRANSCRIPCIÓN ── */
+  .transcription-box {
+    width: 100%;
+    min-height: 80px;
+    padding: 12px;
+    border-radius: var(--radius-sm);
+    border: 1.5px solid var(--border);
+    background: var(--bg);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    color: var(--txt);
+    resize: none;
+    line-height: 1.5;
+  }
+  .transcription-box:focus { outline: 2px solid var(--ocre); border-color: transparent; }
+
+  /* ── GPS ── */
+  .gps-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    background: var(--bg2);
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+  }
+  .gps-coords {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--campo);
+    flex: 1;
+  }
+  .gps-btn {
+    padding: 7px 14px;
+    border-radius: 8px;
+    border: none;
+    background: var(--campo);
+    color: white;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  /* ── FOTO ── */
+  .foto-area {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .foto-preview {
+    width: 80px;
+    height: 80px;
+    border-radius: 10px;
+    object-fit: cover;
+    border: 2px solid var(--border);
+    display: none;
+  }
+  .foto-preview.visible { display: block; }
+  .foto-btn {
+    flex: 1;
+    padding: 14px;
+    border-radius: var(--radius-sm);
+    border: 2px dashed var(--border);
+    background: var(--bg);
+    color: var(--txt2);
+    font-size: 13px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-family: 'DM Sans', sans-serif;
+  }
+  #foto-input { display: none; }
+
+  /* ── BTN GUARDAR ── */
+  .btn-guardar {
+    width: 100%;
+    padding: 16px;
+    border-radius: var(--radius);
+    border: none;
+    background: var(--tierra);
+    color: var(--paja);
+    font-family: 'DM Serif Display', serif;
+    font-size: 17px;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.02em;
+    box-shadow: 0 4px 20px rgba(44,26,14,0.25);
+  }
+  .btn-guardar:active { transform: scale(0.98); }
+  .btn-guardar:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  /* ── HISTORIAL ── */
+  .obs-card {
+    background: white;
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    margin-bottom: 10px;
+    box-shadow: var(--shadow);
+    border-left: 4px solid var(--ocre);
+    display: flex;
+    gap: 12px;
+    position: relative;
+  }
+  .obs-card-foto {
+    width: 56px;
+    height: 56px;
+    border-radius: 8px;
+    object-fit: cover;
+    flex-shrink: 0;
+    border: 1px solid var(--border);
+  }
+  .obs-card-info { flex: 1; min-width: 0; }
+  .obs-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 4px;
+  }
+  .obs-estab {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--tierra);
+  }
+  .obs-hora {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--txt2);
+  }
+  .obs-cat {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 10px;
+    background: var(--bg2);
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--campo);
+    margin-bottom: 5px;
+  }
+  .obs-texto {
+    font-size: 13px;
+    color: var(--txt2);
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .obs-gps {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--brote);
+    margin-top: 4px;
+  }
+  .obs-delete {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    font-size: 16px;
+    color: #ccc;
+    cursor: pointer;
+    padding: 4px;
+  }
+  .empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--txt2);
+  }
+  .empty-state .icon { font-size: 48px; margin-bottom: 12px; }
+  .empty-state p { font-size: 15px; line-height: 1.5; }
+
+  /* ── MAPA ── */
+  #mapa-container {
+    width: 100%;
+    height: 400px;
+    border-radius: var(--radius);
+    overflow: hidden;
+    border: 2px solid var(--border);
+    background: var(--bg2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  #mapa-iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    display: none;
+  }
+  .mapa-placeholder {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--txt2);
+  }
+  .mapa-placeholder .icon { font-size: 48px; margin-bottom: 10px; }
+
+  /* ── LISTA MAPA ── */
+  .pin-list {
+    margin-top: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .pin-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: white;
+    border-radius: 10px;
+    padding: 10px 12px;
+    box-shadow: var(--shadow);
+  }
+  .pin-num {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--ocre);
+    color: var(--tierra);
+    font-weight: 700;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .pin-info { flex: 1; min-width: 0; }
+  .pin-estab { font-size: 13px; font-weight: 600; color: var(--tierra); }
+  .pin-coords { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--campo); }
+
+  /* ── INFORME ── */
+  .informe-box {
+    background: white;
+    border-radius: var(--radius);
+    padding: 18px;
+    margin-bottom: 14px;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+    min-height: 120px;
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--txt);
+    white-space: pre-wrap;
+  }
+  .btn-generar {
+    width: 100%;
+    padding: 16px;
+    border-radius: var(--radius);
+    border: none;
+    background: var(--campo);
+    color: white;
+    font-family: 'DM Serif Display', serif;
+    font-size: 17px;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-bottom: 10px;
+    box-shadow: 0 4px 20px rgba(74,103,65,0.3);
+  }
+  .btn-generar:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn-copiar {
+    width: 100%;
+    padding: 13px;
+    border-radius: var(--radius);
+    border: 2px solid var(--campo);
+    background: transparent;
+    color: var(--campo);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-bottom: 10px;
+    display: none;
+  }
+  .btn-drive {
+    width: 100%;
+    padding: 13px;
+    border-radius: var(--radius);
+    border: none;
+    background: #4285F4;
+    color: white;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  .loading-dots::after {
+    content: '...';
+    animation: dots 1.2s infinite;
+  }
+  @keyframes dots {
+    0%{content:'.'} 33%{content:'..'} 66%{content:'...'} 
+  }
+
+  /* ── TOAST ── */
+  .toast {
+    position: fixed;
+    bottom: 90px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--tierra);
+    color: var(--paja);
+    padding: 12px 20px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 500;
+    z-index: 9999;
+    opacity: 0;
+    transition: all 0.3s;
+    white-space: nowrap;
+    pointer-events: none;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* ── NAV CONTADOR ── */
+  .tab-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--ocre);
+    color: var(--tierra);
+    border-radius: 10px;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 1px 5px;
+    margin-left: 2px;
+  }
+
+  /* ── DRIVE CONFIG ── */
+  .config-input {
+    width: 100%;
+    padding: 11px 13px;
+    border-radius: var(--radius-sm);
+    border: 1.5px solid var(--border);
+    background: var(--bg);
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--txt);
+    margin-top: 6px;
+  }
+  .config-input:focus { outline: 2px solid var(--ocre); border-color: transparent; }
+  .label-sm {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--txt2);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .badge-online { 
+    display: inline-block; padding: 2px 8px; border-radius: 10px;
+    background: rgba(91,184,91,0.15); color: #3a7a3a; font-size: 11px; font-weight: 600;
+  }
+  .badge-offline { 
+    display: inline-block; padding: 2px 8px; border-radius: 10px;
+    background: rgba(232,119,90,0.15); color: #a03a1e; font-size: 11px; font-weight: 600;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-logo">🌾</div>
+  <div class="header-text">
+    <h1>Recorridas</h1>
+    <p>Bellamar Estancias</p>
+  </div>
+  <div class="header-status">
+    <div class="status-dot" id="status-dot"></div>
+    <span id="status-txt">Online</span>
+  </div>
+</div>
+
+<div class="tabs">
+  <button class="tab active" onclick="showPage('registrar')" id="tab-registrar">
+    <span class="icon">📝</span>Registrar
+  </button>
+  <button class="tab" onclick="showPage('historial')" id="tab-historial">
+    <span class="icon">📋</span>Historial<span class="tab-badge" id="badge-count" style="display:none">0</span>
+  </button>
+  <button class="tab" onclick="showPage('mapa')" id="tab-mapa">
+    <span class="icon">🗺️</span>Mapa
+  </button>
+  <button class="tab" onclick="showPage('informe')" id="tab-informe">
+    <span class="icon">📄</span>Informe
+  </button>
+</div>
+
+<!-- ══ REGISTRAR ══ -->
+<div class="page active" id="page-registrar">
+
+  <!-- Establecimiento -->
+  <div class="card">
+    <div class="card-title">🏡 Establecimiento</div>
+    <div class="chips" id="estab-chips">
+      <div class="chip active" onclick="selectEstab(this,'Bellamar')">Bellamar</div>
+      <div class="chip" onclick="selectEstab(this,'El Bonete')">El Bonete</div>
+      <div class="chip" onclick="selectEstab(this,'El Silencio')">El Silencio</div>
+      <div class="chip" onclick="selectEstab(this,'La Sarah')">La Sarah</div>
+      <div class="chip" onclick="selectEstab(this,'Las Lomas')">Las Lomas</div>
+      <div class="chip" onclick="selectEstab(this,'San Juan')">San Juan</div>
+      <div class="chip" onclick="selectEstab(this,'Guaycolec')">Guaycolec</div>
+      <div class="chip" onclick="selectEstab(this,'Pzo del Tume')">Pzo del Tume</div>
+    </div>
+  </div>
+
+  <!-- Categoría -->
+  <div class="card">
+    <div class="card-title">🏷️ Categoría</div>
+    <div class="cat-grid">
+      <button class="cat-btn active" onclick="selectCat(this,'Cultivos')"><span class="icon">🌾</span>Cultivos</button>
+      <button class="cat-btn" onclick="selectCat(this,'Hacienda')"><span class="icon">🐄</span>Hacienda</button>
+      <button class="cat-btn" onclick="selectCat(this,'Pasturas')"><span class="icon">🌿</span>Pasturas</button>
+      <button class="cat-btn" onclick="selectCat(this,'Malezas')"><span class="icon">🌱</span>Malezas</button>
+      <button class="cat-btn" onclick="selectCat(this,'Plagas')"><span class="icon">🐛</span>Plagas</button>
+      <button class="cat-btn" onclick="selectCat(this,'Infraestructura')"><span class="icon">🔧</span>Infraestructura</button>
+    </div>
+  </div>
+
+  <!-- GPS -->
+  <div class="card">
+    <div class="card-title">📍 Ubicación GPS</div>
+    <div class="gps-row">
+      <div class="gps-coords" id="gps-display">Sin coordenadas</div>
+      <button class="gps-btn" onclick="captureGPS()">📍 Capturar</button>
+    </div>
+  </div>
+
+  <!-- Nota de voz -->
+  <div class="card">
+    <div class="card-title">🎙️ Nota de voz</div>
+    <div class="record-area">
+      <button class="record-btn" id="record-btn" onclick="toggleRecording()">🎙️</button>
+      <div class="record-timer" id="record-timer">00:00</div>
+      <div style="font-size:12px;color:var(--txt2);text-align:center;">Presioná para grabar · se transcribe automáticamente</div>
+    </div>
+    <textarea class="transcription-box" id="transcription" placeholder="La transcripción aparece aquí automáticamente, o escribí directamente..."></textarea>
+  </div>
+
+  <!-- Foto -->
+  <div class="card">
+    <div class="card-title">📷 Foto</div>
+    <div class="foto-area">
+      <img class="foto-preview" id="foto-preview" alt="foto">
+      <label class="foto-btn" for="foto-input">
+        📷 <span id="foto-label">Tomar foto</span>
+      </label>
+      <input type="file" id="foto-input" accept="image/*" capture="environment" onchange="handleFoto(event)">
+    </div>
+  </div>
+
+  <!-- Guardar -->
+  <button class="btn-guardar" onclick="guardarObservacion()">Guardar observación</button>
+
+</div>
+
+<!-- ══ HISTORIAL ══ -->
+<div class="page" id="page-historial">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+    <div style="font-family:'DM Serif Display',serif;font-size:18px;color:var(--tierra)">Observaciones</div>
+    <button onclick="limpiarTodo()" style="background:none;border:none;color:var(--txt2);font-size:13px;cursor:pointer;padding:6px;">Limpiar todo</button>
+  </div>
+  <div id="historial-list"></div>
+</div>
+
+<!-- ══ MAPA ══ -->
+<div class="page" id="page-mapa">
+  <div class="card" style="margin-bottom:14px;">
+    <div class="card-title">🗺️ Trayectoria del día</div>
+    <div id="mapa-container">
+      <div class="mapa-placeholder" id="mapa-placeholder">
+        <div class="icon">🗺️</div>
+        <p>Guardá observaciones con GPS<br>para ver los pins en el mapa</p>
+      </div>
+      <iframe id="mapa-iframe"></iframe>
+    </div>
+  </div>
+  <div class="pin-list" id="pin-list"></div>
+</div>
+
+<!-- ══ INFORME ══ -->
+<div class="page" id="page-informe">
+
+  <div class="card">
+    <div class="card-title">⚙️ Configuración API</div>
+    <div class="label-sm" style="margin-bottom:4px;">Claude API Key</div>
+    <input type="password" class="config-input" id="api-key-input" placeholder="sk-ant-..." oninput="saveApiKey()">
+    <div style="font-size:11px;color:var(--txt2);margin-top:6px;">Se guarda localmente en el dispositivo</div>
+
+    <div class="label-sm" style="margin-bottom:4px;margin-top:12px;">URL Google Apps Script (Drive)</div>
+    <input type="text" class="config-input" id="gas-url-input" placeholder="https://script.google.com/macros/s/..." oninput="saveGasUrl()">
+    <div style="font-size:11px;color:var(--txt2);margin-top:6px;">Para guardar automáticamente en Drive</div>
+  </div>
+
+  <button class="btn-generar" id="btn-generar" onclick="generarInforme()">
+    🤖 Generar informe con IA
+  </button>
+
+  <div class="informe-box" id="informe-output">El informe aparecerá aquí una vez generado...</div>
+
+  <button class="btn-copiar" id="btn-copiar" onclick="copiarInforme()">📋 Copiar informe</button>
+  <button class="btn-drive" id="btn-drive" onclick="guardarEnDrive()">
+    <svg width="18" height="18" viewBox="0 0 87.3 78" fill="white"><path d="m6.6 66.85 3.85 6.65c.8 1.4 1.95 2.5 3.3 3.3l13.75-23.8H.1c0 1.55.4 3.1 1.2 4.5z"/><path d="M43.65 25 29.9 1.2C28.55 2 27.4 3.1 26.6 4.5L1.2 49.15C.4 50.55 0 52.1 0 53.65h27.5z"/><path d="m80.7 76.8 3.85-6.65c.8-1.4 1.2-2.95 1.2-4.5H58.1l5.85 11.2z"/><path d="M43.65 25 57.4 1.2c-1.35-.8-2.9-1.2-4.5-1.2H34.75c-1.6 0-3.15.45-4.5 1.2z"/><path d="M58.1 53.65H27.5L13.75 77.45c1.35.8 2.9 1.2 4.5 1.2h50.05c1.6 0 3.15-.45 4.5-1.2z"/><path d="M86.1 49.15 60.7 4.5c-.8-1.4-1.95-2.5-3.3-3.3L43.65 25l16.45 28.5H87.3c0-1.55-.4-3.1-1.2-4.35z"/></svg>
+    Guardar en Google Drive
+  </button>
+
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ══ ESTADO ══
+let estado = {
+  estab: 'Bellamar',
+  cat: 'Cultivos',
+  gps: null,
+  fotoData: null,
+  fotoBase64: null
+};
+
+let observaciones = [];
+let mediaRecorder = null;
+let grabando = false;
+let timerInterval = null;
+let segundos = 0;
+let recognition = null;
+let informeTexto = '';
+
+// ══ INICIALIZACIÓN ══
+window.addEventListener('load', () => {
+  cargarDatos();
+  detectarConexion();
+  window.addEventListener('online', detectarConexion);
+  window.addEventListener('offline', detectarConexion);
+  initSpeechRecognition();
+
+  const apiKey = localStorage.getItem('claude_api_key');
+  if (apiKey) document.getElementById('api-key-input').value = apiKey;
+  const gasUrl = localStorage.getItem('gas_url');
+  if (gasUrl) document.getElementById('gas-url-input').value = gasUrl;
+});
+
+function detectarConexion() {
+  const online = navigator.onLine;
+  document.getElementById('status-dot').className = 'status-dot' + (online ? '' : ' offline');
+  document.getElementById('status-txt').textContent = online ? 'Online' : 'Sin señal';
+}
+
+// ══ NAVEGACIÓN ══
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  document.getElementById('tab-' + id).classList.add('active');
+  if (id === 'mapa') renderMapa();
+  if (id === 'historial') renderHistorial();
+}
+
+// ══ SELECCIÓN ══
+function selectEstab(el, val) {
+  document.querySelectorAll('#estab-chips .chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  estado.estab = val;
+}
+
+function selectCat(el, val) {
+  document.querySelectorAll('.cat-btn').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  estado.cat = val;
+}
+
+// ══ GPS ══
+function captureGPS() {
+  const btn = document.querySelector('.gps-btn');
+  btn.textContent = '⏳ Buscando...';
+  btn.disabled = true;
+  if (!navigator.geolocation) {
+    toast('GPS no disponible en este dispositivo');
+    btn.textContent = '📍 Capturar';
+    btn.disabled = false;
+    return;
+  }
+  navigator.geolocation.getCurrentPosition(
+    pos => {
+      estado.gps = { lat: pos.coords.latitude.toFixed(6), lng: pos.coords.longitude.toFixed(6) };
+      document.getElementById('gps-display').textContent = `${estado.gps.lat}, ${estado.gps.lng}`;
+      document.getElementById('gps-display').style.color = 'var(--campo)';
+      btn.textContent = '✅ OK';
+      btn.disabled = false;
+      toast('📍 Ubicación capturada');
+    },
+    err => {
+      toast('No se pudo obtener el GPS');
+      btn.textContent = '📍 Capturar';
+      btn.disabled = false;
+    },
+    { enableHighAccuracy: true, timeout: 12000 }
+  );
+}
+
+// ══ VOZ ══
+function initSpeechRecognition() {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) return;
+  recognition = new SR();
+  recognition.lang = 'es-AR';
+  recognition.continuous = true;
+  recognition.interimResults = true;
+  let finalTranscript = '';
+
+  recognition.onresult = (e) => {
+    let interim = '';
+    for (let i = e.resultIndex; i < e.results.length; i++) {
+      if (e.results[i].isFinal) finalTranscript += e.results[i][0].transcript + ' ';
+      else interim += e.results[i][0].transcript;
+    }
+    document.getElementById('transcription').value = finalTranscript + interim;
+  };
+  recognition.onerror = () => {};
+  recognition._finalTranscript = () => finalTranscript = '';
+}
+
+function toggleRecording() {
+  if (!grabando) startRecording();
+  else stopRecording();
+}
+
+function startRecording() {
+  grabando = true;
+  segundos = 0;
+  const btn = document.getElementById('record-btn');
+  btn.classList.add('recording');
+  btn.textContent = '⏹️';
+  document.getElementById('record-timer').classList.add('visible');
+  timerInterval = setInterval(() => {
+    segundos++;
+    const m = String(Math.floor(segundos/60)).padStart(2,'0');
+    const s = String(segundos%60).padStart(2,'0');
+    document.getElementById('record-timer').textContent = `${m}:${s}`;
+  }, 1000);
+
+  if (recognition) {
+    document.getElementById('transcription').value = '';
+    try { recognition.start(); } catch(e) {}
+  }
+}
+
+function stopRecording() {
+  grabando = false;
+  clearInterval(timerInterval);
+  const btn = document.getElementById('record-btn');
+  btn.classList.remove('recording');
+  btn.textContent = '🎙️';
+  document.getElementById('record-timer').classList.remove('visible');
+  if (recognition) { try { recognition.stop(); } catch(e) {} }
+}
+
+// ══ FOTO ══
+function handleFoto(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    estado.fotoBase64 = ev.target.result;
+    const preview = document.getElementById('foto-preview');
+    preview.src = ev.target.result;
+    preview.classList.add('visible');
+    document.getElementById('foto-label').textContent = 'Cambiar foto';
+    toast('📷 Foto lista');
+  };
+  reader.readAsDataURL(file);
+}
+
+// ══ GUARDAR OBSERVACIÓN ══
+function guardarObservacion() {
+  const texto = document.getElementById('transcription').value.trim();
+  if (!texto) { toast('⚠️ Escribí o grabá una nota'); return; }
+
+  const obs = {
+    id: Date.now(),
+    fecha: new Date().toLocaleDateString('es-AR'),
+    hora: new Date().toLocaleTimeString('es-AR', {hour:'2-digit',minute:'2-digit'}),
+    estab: estado.estab,
+    cat: estado.cat,
+    gps: estado.gps ? {...estado.gps} : null,
+    texto: texto,
+    foto: estado.fotoBase64 || null
+  };
+
+  observaciones.unshift(obs);
+  guardarDatos();
+  resetForm();
+  actualizarBadge();
+  toast('✅ Observación guardada');
+}
+
+function resetForm() {
+  document.getElementById('transcription').value = '';
+  document.getElementById('gps-display').textContent = 'Sin coordenadas';
+  document.getElementById('gps-display').style.color = '';
+  document.getElementById('foto-preview').classList.remove('visible');
+  document.getElementById('foto-label').textContent = 'Tomar foto';
+  document.getElementById('foto-input').value = '';
+  document.querySelector('.gps-btn').textContent = '📍 Capturar';
+  estado.gps = null;
+  estado.fotoBase64 = null;
+}
+
+// ══ HISTORIAL ══
+function renderHistorial() {
+  const el = document.getElementById('historial-list');
+  if (!observaciones.length) {
+    el.innerHTML = `<div class="empty-state"><div class="icon">📋</div><p>Aún no hay observaciones.<br>Registrá la primera desde la pestaña <b>Registrar</b>.</p></div>`;
+    return;
+  }
+  el.innerHTML = observaciones.map((obs, i) => `
+    <div class="obs-card">
+      ${obs.foto ? `<img class="obs-card-foto" src="${obs.foto}" alt="">` : ''}
+      <div class="obs-card-info">
+        <div class="obs-card-header">
+          <div class="obs-estab">${obs.estab}</div>
+          <div class="obs-hora">${obs.hora}</div>
+        </div>
+        <div class="obs-cat">${obs.cat}</div>
+        <div class="obs-texto">${obs.texto}</div>
+        ${obs.gps ? `<div class="obs-gps">📍 ${obs.gps.lat}, ${obs.gps.lng}</div>` : ''}
+      </div>
+      <button class="obs-delete" onclick="eliminarObs(${obs.id})">✕</button>
+    </div>
+  `).join('');
+}
+
+function eliminarObs(id) {
+  observaciones = observaciones.filter(o => o.id !== id);
+  guardarDatos();
+  actualizarBadge();
+  renderHistorial();
+}
+
+function limpiarTodo() {
+  if (!observaciones.length) return;
+  if (!confirm('¿Eliminar todas las observaciones?')) return;
+  observaciones = [];
+  guardarDatos();
+  actualizarBadge();
+  renderHistorial();
+}
+
+// ══ MAPA ══
+function renderMapa() {
+  const conGPS = observaciones.filter(o => o.gps);
+  const pinList = document.getElementById('pin-list');
+  const mapaPlaceholder = document.getElementById('mapa-placeholder');
+  const mapaIframe = document.getElementById('mapa-iframe');
+
+  if (!conGPS.length) {
+    mapaPlaceholder.style.display = 'block';
+    mapaIframe.style.display = 'none';
+    pinList.innerHTML = '';
+    return;
+  }
+
+  mapaPlaceholder.style.display = 'none';
+  mapaIframe.style.display = 'block';
+
+  // Usar OpenStreetMap embed con marcadores
+  const center = conGPS[0];
+  const markers = conGPS.map((o, i) =>
+    `marker=${o.gps.lat},${o.gps.lng}`
+  ).join('&');
+  const url = `https://www.openstreetmap.org/export/embed.html?bbox=${conGPS[0].gps.lng-0.05},${conGPS[0].gps.lat-0.05},${conGPS[0].gps.lng+0.05},${conGPS[0].gps.lat+0.05}&layer=mapnik`;
+  mapaIframe.src = url;
+
+  pinList.innerHTML = conGPS.map((obs, i) => `
+    <div class="pin-item">
+      <div class="pin-num">${i+1}</div>
+      <div class="pin-info">
+        <div class="pin-estab">${obs.estab} · ${obs.cat}</div>
+        <div style="font-size:12px;color:var(--txt2);margin:2px 0">${obs.texto.substring(0,60)}${obs.texto.length>60?'...':''}</div>
+        <div class="pin-coords">📍 ${obs.gps.lat}, ${obs.gps.lng}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ══ INFORME ══
+async function generarInforme() {
+  if (!observaciones.length) { toast('⚠️ No hay observaciones para generar el informe'); return; }
+  const apiKey = localStorage.getItem('claude_api_key');
+  if (!apiKey) { toast('⚠️ Configurá la API Key primero'); return; }
+  if (!navigator.onLine) { toast('⚠️ Necesitás conexión para generar el informe'); return; }
+
+  const btn = document.getElementById('btn-generar');
+  btn.disabled = true;
+  btn.innerHTML = '⏳ Generando<span class="loading-dots"></span>';
+  document.getElementById('informe-output').textContent = 'Procesando observaciones con IA...';
+
+  const contenido = observaciones.map((o, i) => {
+    let t = `\n## Observación ${i+1}\n`;
+    t += `- Establecimiento: ${o.estab}\n`;
+    t += `- Categoría: ${o.cat}\n`;
+    t += `- Hora: ${o.hora}\n`;
+    if (o.gps) t += `- GPS: ${o.gps.lat}, ${o.gps.lng}\n`;
+    t += `- Nota: ${o.texto}\n`;
+    return t;
+  }).join('');
+
+  const fecha = new Date().toLocaleDateString('es-AR', {weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  const prompt = `Sos un asesor agronómico senior de Bellamar Estancias S.A., empresa agrícola argentina con establecimientos en Córdoba, Salta y Buenos Aires.
+
+A continuación te proporciono las observaciones de campo del día ${fecha}, registradas durante una recorrida de campo.
+
+${contenido}
+
+Generá un INFORME DE RECORRIDA DE CAMPO con el siguiente formato:
+
+**INFORME DE RECORRIDA — BELLAMAR ESTANCIAS**
+Fecha: ${fecha}
+Responsable: Juan Martín Lahitte
+
+---
+
+**ESTABLECIMIENTOS VISITADOS**
+(lista con los establecimientos recorridos)
+
+---
+
+**OBSERVACIONES DETALLADAS**
+(por cada observación, en orden cronológico, con 📍 y coordenadas GPS si hay)
+
+---
+
+**ACCIONES PENDIENTES**
+(lista de tareas prioritarias detectadas)
+
+---
+
+**RESUMEN EJECUTIVO**
+(2-3 párrafos de síntesis con tono técnico y profesional)
+
+Usá lenguaje técnico agropecuario argentino. Sé conciso y directo.`;
+
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 2000,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    const data = await response.json();
+    if (data.error) throw new Error(data.error.message);
+    informeTexto = data.content[0].text;
+    document.getElementById('informe-output').textContent = informeTexto;
+    document.getElementById('btn-copiar').style.display = 'block';
+    const gasUrl = localStorage.getItem('gas_url');
+    if (gasUrl) {
+      document.getElementById('btn-drive').style.display = 'flex';
+    }
+    toast('✅ Informe generado');
+  } catch(err) {
+    document.getElementById('informe-output').textContent = 'Error al generar el informe: ' + err.message;
+    toast('❌ Error: ' + err.message.substring(0,40));
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = '🔄 Regenerar informe';
+}
+
+function copiarInforme() {
+  if (!informeTexto) return;
+  navigator.clipboard.writeText(informeTexto).then(() => toast('📋 Copiado al portapapeles'));
+}
+
+async function guardarEnDrive() {
+  const gasUrl = localStorage.getItem('gas_url');
+  if (!gasUrl) { toast('⚠️ Configurá la URL del Apps Script'); return; }
+  if (!informeTexto) { toast('⚠️ Primero generá el informe'); return; }
+
+  const btn = document.getElementById('btn-drive');
+  btn.disabled = true;
+  btn.innerHTML = '⏳ Guardando...';
+
+  const payload = {
+    fecha: new Date().toLocaleDateString('es-AR'),
+    informe: informeTexto,
+    obs: observaciones.map(o => ({
+      estab: o.estab, cat: o.cat, hora: o.hora,
+      gps: o.gps, texto: o.texto
+    }))
+  };
+
+  try {
+    await fetch(gasUrl, {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    });
+    toast('✅ Guardado en Drive');
+  } catch(err) {
+    toast('❌ Error al guardar en Drive');
+  }
+  btn.disabled = false;
+  btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 87.3 78" fill="white"><path d="m6.6 66.85 3.85 6.65c.8 1.4 1.95 2.5 3.3 3.3l13.75-23.8H.1c0 1.55.4 3.1 1.2 4.5z"/><path d="M43.65 25 29.9 1.2C28.55 2 27.4 3.1 26.6 4.5L1.2 49.15C.4 50.55 0 52.1 0 53.65h27.5z"/><path d="m80.7 76.8 3.85-6.65c.8-1.4 1.2-2.95 1.2-4.5H58.1l5.85 11.2z"/><path d="M43.65 25 57.4 1.2c-1.35-.8-2.9-1.2-4.5-1.2H34.75c-1.6 0-3.15.45-4.5 1.2z"/><path d="M58.1 53.65H27.5L13.75 77.45c1.35.8 2.9 1.2 4.5 1.2h50.05c1.6 0 3.15-.45 4.5-1.2z"/><path d="M86.1 49.15 60.7 4.5c-.8-1.4-1.95-2.5-3.3-3.3L43.65 25l16.45 28.5H87.3c0-1.55-.4-3.1-1.2-4.35z"/></svg> Guardado en Drive';
+}
+
+// ══ PERSISTENCIA LOCAL ══
+function guardarDatos() {
+  try {
+    localStorage.setItem('bellamar_obs', JSON.stringify(observaciones));
+  } catch(e) {
+    // Si hay fotos pesadas, guardar sin fotos
+    const sinFotos = observaciones.map(o => ({...o, foto: null}));
+    localStorage.setItem('bellamar_obs', JSON.stringify(sinFotos));
+    toast('⚠️ Fotos no guardadas (espacio lleno)');
+  }
+}
+
+function cargarDatos() {
+  const saved = localStorage.getItem('bellamar_obs');
+  if (saved) {
+    try { observaciones = JSON.parse(saved); } catch(e) { observaciones = []; }
+  }
+  actualizarBadge();
+}
+
+function actualizarBadge() {
+  const badge = document.getElementById('badge-count');
+  if (observaciones.length) {
+    badge.textContent = observaciones.length;
+    badge.style.display = 'inline-flex';
+  } else {
+    badge.style.display = 'none';
+  }
+}
+
+function saveApiKey() {
+  localStorage.setItem('claude_api_key', document.getElementById('api-key-input').value);
+}
+function saveGasUrl() {
+  localStorage.setItem('gas_url', document.getElementById('gas-url-input').value);
+}
+
+// ══ TOAST ══
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2800);
+}
+</script>
+</body>
+</html>
