@@ -1163,7 +1163,7 @@ Usá lenguaje técnico agropecuario argentino. Sé conciso y directo.`;
     const data = await response.json();
     if (data.error) throw new Error(data.error.message);
     informeTexto = data.content[0].text;
-    document.getElementById('informe-output').textContent = informeTexto;
+    renderInformeConFotos(informeTexto);
     document.getElementById('btn-copiar').style.display = 'block';
     const gasUrl = localStorage.getItem('gas_url');
     if (gasUrl) {
@@ -1177,6 +1177,46 @@ Usá lenguaje técnico agropecuario argentino. Sé conciso y directo.`;
 
   btn.disabled = false;
   btn.innerHTML = '🔄 Regenerar informe';
+}
+
+function renderInformeConFotos(texto) {
+  const conFoto = observaciones.filter(o => o.foto);
+  const output = document.getElementById('informe-output');
+
+  // Renderizar texto con formato básico
+  let html = texto
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/^---$/gm, '<hr style="border:none;border-top:1px solid var(--border);margin:12px 0">')
+    .replace(/\n/g, '<br>');
+
+  output.innerHTML = html;
+
+  // Si hay fotos, agregar galería al final
+  if (conFoto.length) {
+    const galeria = document.createElement('div');
+    galeria.style.cssText = 'margin-top:20px;border-top:2px solid var(--border);padding-top:16px;';
+    galeria.innerHTML = `<div style="font-family:\'DM Serif Display\',serif;font-size:15px;color:var(--tierra);margin-bottom:12px;">📷 Fotos de la recorrida</div>`;
+
+    const grid = document.createElement('div');
+    grid.style.cssText = 'display:grid;grid-template-columns:repeat(2,1fr);gap:10px;';
+
+    conFoto.forEach((obs, i) => {
+      const item = document.createElement('div');
+      item.style.cssText = 'border-radius:10px;overflow:hidden;border:1px solid var(--border);background:white;';
+      item.innerHTML = `
+        <img src="${obs.foto}" style="width:100%;height:120px;object-fit:cover;display:block;">
+        <div style="padding:8px;">
+          <div style="font-size:11px;font-weight:600;color:var(--tierra)">${obs.estab}</div>
+          <div style="font-size:10px;color:var(--campo);margin:2px 0">${obs.cat} · ${obs.hora}</div>
+          ${obs.gps ? `<div style="font-family:\'DM Mono\',monospace;font-size:9px;color:var(--brote)">📍 ${obs.gps.lat}, ${obs.gps.lng}</div>` : ''}
+        </div>
+      `;
+      grid.appendChild(item);
+    });
+
+    galeria.appendChild(grid);
+    output.appendChild(galeria);
+  }
 }
 
 function copiarInforme() {
